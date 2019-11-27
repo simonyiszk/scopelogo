@@ -9,8 +9,8 @@ def parse_poly(s):
   return [tuple([float(x) for x in pointstr.split(',')]) for pointstr in splitter.split(s.strip())]
 
         
-def parse_svg():
-    doc = minidom.parse('logo.svg')  # parseString also exists
+def parse_svg(fn):
+    doc = minidom.parse(fn)  # parseString also exists
     path_strings = [path.getAttribute('d') for path in doc.getElementsByTagName('path')]
     polygon_strings = [p.getAttribute('points') for p in doc.getElementsByTagName('polygon')]
     doc.unlink()
@@ -30,7 +30,7 @@ def loop_interlace(data1, data2):
         interlaced.append(y)
     loop(interlaced)
 
-line_speed = 1000
+line_speed = 100000
 samp_rate = 48000
 def line(x1, y1, x2, y2):
     step = line_speed / samp_rate
@@ -71,7 +71,7 @@ def path(p):
 def rescale(coords, scale):
     return [x/scale for x in coords]
 
-polys, paths = parse_svg()
+polys, paths = parse_svg(sys.argv[1])
 x = []
 y = []
 for p in polys:
