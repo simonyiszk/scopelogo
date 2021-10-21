@@ -66,7 +66,7 @@ rot_mat2 = np.array([
 
 
 while True:
-    t = time.clock()
+    t = time.monotonic()
     rotx = t
     roty = 0.5* t
     rot_mat = np.array([

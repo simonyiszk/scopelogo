@@ -30,7 +30,7 @@ def loop_interlace(data1, data2):
         interlaced.append(y)
     loop(interlaced)
 
-line_speed = 100000
+line_speed = 300000
 samp_rate = 48000
 def line(x1, y1, x2, y2):
     step = line_speed / samp_rate
