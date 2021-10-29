@@ -6,8 +6,8 @@ from svg.path import parse_path
 
 def parse_poly(s):
   splitter = re.compile('''\s+''')
-  return [tuple([float(x) for x in pointstr.split(',')]) for pointstr in splitter.split(s.strip())]
-
+  points = list(map(float, splitter.split(s.replace(",", " ").strip())))
+  return [(points[i], points[i+1]) for i in range(0,len(points), 2)]
         
 def parse_svg(fn):
     doc = minidom.parse(fn)  # parseString also exists
@@ -23,15 +23,14 @@ def loop(data):
         arr = bytearray(bindata)
         sys.stdout.buffer.write(arr)
 
+def interlace(data1, data2):
+    return [v for pair in zip(data1, data2) for v in pair]
+
 def loop_interlace(data1, data2):
-    interlaced = []
-    for x, y in zip(data1, data2):
-        interlaced.append(x)
-        interlaced.append(y)
-    loop(interlaced)
+    loop(interlace(data1, data2))
 
 line_speed = 300000
-samp_rate = 48000
+samp_rate = 192000
 def line(x1, y1, x2, y2):
     step = line_speed / samp_rate
     l = sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -71,19 +70,20 @@ def path(p):
 def rescale(coords, scale):
     return [x/scale for x in coords]
 
-polys, paths = parse_svg(sys.argv[1])
-x = []
-y = []
-for p in polys:
-    px, py = poly(p)
-    x += px
-    y += py
-for p in paths:
-    px, py = path(p)
-    x += px
-    y += py
-x = rescale(x, 1000)
-y = rescale(y, 350)
-loop_interlace(x, y)
+def scopelogo(filepath):
+    polys, paths = parse_svg(filepath)
+    all_shapes = [(p, 'poly') for p in polys] + [(p, 'path') for p in paths]
+    x = []
+    y = []
+    for shape, type in all_shapes:
+        px, py = {"poly":poly, "path":path}[type](shape)
+        x += px
+        y += py
 
+    x = rescale(x, 1500)
+    y = rescale(y, 1000)
+    loop_interlace(x, y)
 
+if __name__=="__main__":
+    import sys
+    scopelogo(sys.argv[1])
